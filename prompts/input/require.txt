@@ -1,0 +1,69 @@
+Tôi đã có sẵn các thành phần cơ bản sau trong dự án ASP.NET Core của mình:
+- 2 lớp ApiResponse<T> và ApiPagedResponse<T> để chuẩn hóa format trả về API
+- 1 middleware ExceptionMiddleware để xử lý lỗi toàn cục
+- Các entity đã định nghĩa đầy đủ
+- 1 ApplicationDbContext đã cấu hình chính xác (EF Core, SQL Server)
+- Dự án đang theo kiến trúc Layered Architecture với luồng: Controller → Service → Repository → Database
+- Cấu trúc thư mục như sau:
+/Controllers
+/Services
+    /Interfaces
+    /Implements
+/Repositories
+    /Interfaces
+    /Implements
+/Middlewares
+/Dtos
+/Entities
+/DbContexts
+Program.cs
+
+A. Yêu cầu của tôi:
+
+1. Dựa trên tất cả các Entity hiện có trong ApplicationDbContext,
+hãy tự động tạo tất cả các file Controller cần thiết trong thư mục /Controllers, mỗi Controller bao gồm các API CRUD cơ bản:
+- GET (Get all, Get by id)
+- POST (Create)
+- PUT (Update)
+- DELETE (Soft delete nếu entity có IsDeleted)
+
+2. Với mỗi Controller:
+- Tạo Service Interface tương ứng trong /Services/Interfaces
+- Tạo Service Implementation tương ứng trong /Services/Implements
+- Tạo Repository Interface tương ứng trong /Repositories/Interfaces
+- Tạo Repository Implementation tương ứng trong /Repositories/Implements
+- Service sẽ gọi Repository, Repository thao tác trực tiếp với ApplicationDbContext
+
+3. Cập nhật Program.cs:
+- Tự động đăng ký (inject) tất cả Service và Repository với builder.Services.AddScoped<>()
+- Đảm bảo Middleware ExceptionMiddleware vẫn được gọi đúng thứ tự
+
+4. Cấu hình JWT Authentication + Authorization:
+- Tạo file cấu hình JWT mẫu (SecretKey, Issuer, Audience)
+- Cập nhật Program.cs để kích hoạt JWT Bearer Authentication
+- Tạo 1 Controller mẫu (AuthController) có:
+    + Login trả về JWT Token (demo)
+    + GetProfile yêu cầu [Authorize]
+    + Phân quyền demo [Authorize(Roles = "Admin")]
+
+5. Những phần yêu cầu tích hợp ngoài (MinIO, Log, Notification, AI, v.v.) chỉ cần tạo file hoặc cấu trúc cơ bản, không cần viết chi tiết nội dung.
+
+B. Cách làm việc:
+- Trước khi viết code, hãy giải thích cho tôi bạn định làm gì với dự án của tôi:
+    + Cách bạn sẽ sinh Controller, Service, Repository
+    + Cách bạn sẽ cấu hình JWT
+    + Cách bạn sẽ update Program.cs
+- Chờ tôi đồng ý rồi mới bắt đầu tạo code.
+- Khi tôi xác nhận, bạn có thể bắt đầu:
+    + Sinh code từng phần (Repositories → Services → Controllers → Program.cs)
+    + Giải thích ngắn gọn mỗi phần bạn sinh ra.
+
+C. Lưu ý:
+- Toàn bộ code phải dùng async/await
+- Trả về ApiResponse hoặc ApiPagedResponse ở mọi API
+- Dùng dependency injection cho tất cả Repository và Service
+- Các class đặt đúng namespace tương ứng (football_field_booking_backend.Services.Interfaces, v.v.)
+- Giữ code sạch, dễ đọc, có comment hợp lý
+
+Nếu bạn hiểu rõ toàn bộ yêu cầu trên, hãy trả lời cho tôi trước bằng cách mô tả kế hoạch bạn sẽ thực hiện (cụ thể từng bước, từng lớp, từng file).
+Khi tôi đồng ý, bạn mới bắt đầu sinh code.

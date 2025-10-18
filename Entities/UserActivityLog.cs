@@ -1,0 +1,16 @@
+namespace FootballField.API.Entities;
+
+public class UserActivityLog
+{
+    public long Id { get; set; }
+    public int? UserId { get; set; }
+    public string? SessionId { get; set; }
+    public UserRole? Role { get; set; }
+    public string? Action { get; set; }
+    public string? TargetTable { get; set; }
+    public int? TargetId { get; set; }
+    public string? Description { get; set; }
+    public string? IpAddress { get; set; }
+    public string? UserAgent { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+}

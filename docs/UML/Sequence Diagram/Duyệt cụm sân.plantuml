@@ -1,0 +1,17 @@
+@startuml
+title Sequence Diagram - Admin duyệt cụm sân
+
+actor "Admin" as A
+participant "API / Admin Panel" as API
+database "Database" as DB
+
+A -> API: Xem danh sách cụm sân chờ duyệt (status = Pending)
+API -> DB: Truy vấn COMPLEX(status = 0)
+DB --> API: Trả danh sách
+A -> API: Chọn cụm sân → Duyệt hoặc Từ chối
+API -> DB: Cập nhật COMPLEX.status = 1 (Approved) hoặc 2 (Rejected)
+DB --> API: OK
+API -> DB: Ghi USER_ACTIVITY_LOG (ApproveComplex)
+DB --> API: OK
+API --> A: Thông báo cập nhật thành công
+@enduml

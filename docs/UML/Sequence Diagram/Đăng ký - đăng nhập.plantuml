@@ -1,0 +1,25 @@
+@startuml
+title Sequence Diagram - Đăng ký & Đăng nhập người dùng
+
+actor "Người dùng (Customer/Owner)" as U
+participant "API / WebApp" as API
+database "Database" as DB
+
+== Đăng ký tài khoản ==
+U -> API: Gửi thông tin đăng ký (họ, tên, email, sđt, mật khẩu)
+API -> DB: Kiểm tra email / số điện thoại trùng
+DB --> API: Kết quả kiểm tra
+API -> DB: Tạo tài khoản mới\nstatus = Active, role = Customer hoặc Owner
+DB --> API: Xác nhận tạo thành công
+API --> U: Thông báo đăng ký thành công\nYêu cầu xác minh email (nếu cần)
+
+== Đăng nhập ==
+U -> API: Gửi email/sđt + mật khẩu
+API -> DB: Kiểm tra thông tin đăng nhập
+DB --> API: Trả kết quả hợp lệ
+API -> API: Sinh JWT Token và refresh token
+API -> DB: Cập nhật last_login
+DB --> API: Xác nhận cập nhật
+API --> U: Trả JWT Token, thông tin user
+
+@enduml

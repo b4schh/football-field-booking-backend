@@ -1,0 +1,60 @@
+A. Bối cảnh dự án: Tôi đang có một dự án ASP.NET Core Web API theo kiến trúc Layered Architecture với các thành phần sau:
+- Các Entities đầy đủ (User, Booking, Field, Complex, Review, …)
+- ApplicationDbContext
+- Middleware ExceptionMiddleware
+- Hai lớp ApiResponse<T> và ApiPagedResponse<T> để chuẩn hóa phản hồi API
+- JWT Authentication đã được cấu hình trong Program.cs
+- Các thư mục:
+Controllers/
+Services/
+    Interfaces/
+    Implements/
+Repositories/
+    Interfaces/
+    Implements/
+Dtos/
+DbContexts/
+Middlewares/
+- Toàn bộ Controllers, Services, Repositories đã được tạo sẵn và hoạt động, nhưng hiện tại đang thao tác trực tiếp với Entity thay vì dùng DTO.
+
+B. Nhiệm vụ cho Copilot: Hãy giúp tôi:
+1. Tạo các DTO cần thiết cho từng entity hiện có, theo quy tắc sau:
+- Create<EntityName>Dto (dùng cho POST)
+- Update<EntityName>Dto (dùng cho PUT)
+- <EntityName>Dto (dùng cho phản hồi dữ liệu)
+- Nếu entity nào không cần đủ 3 loại thì chỉ tạo loại phù hợp.
+- Đặt chúng trong thư mục Dtos/<EntityName>/
+
+2. Cập nhật tất cả Service và Controller để:
+- Nhận và trả dữ liệu thông qua DTO thay vì Entity.
+- Controller trả về ApiResponse<T> hoặc ApiPagedResponse<T> với T là DTO tương ứng.
+- Service thực hiện ánh xạ Entity ↔ DTO thủ công hoặc qua AutoMapper.
+
+3. Repository không thay đổi — vẫn làm việc với Entity và DbContext.
+4. Nếu cần, hãy tạo file Mappings/MappingProfile.cs và đăng ký AutoMapper trong Program.cs.
+5. Giữ nguyên toàn bộ cấu trúc và logic CRUD đã có, chỉ bổ sung và chỉnh sửa để dùng DTO.
+
+C. Quy trình thực hiện
+
+Bước 1: Trình bày kế hoạch chi tiết trước khi code:
+- Các loại DTO bạn định tạo cho từng entity.
+- File nào bạn sẽ chỉnh sửa.
+- Có dùng AutoMapper hay không.
+- Cách bạn sẽ cập nhật Controller/Service.
+
+Bước 2: Khi tôi gõ “Đồng ý, hãy bắt đầu”, bạn sẽ:
+- Tạo các file DTO theo kế hoạch.
+- Cập nhật code Controller và Service tương ứng để sử dụng DTO.
+- Chỉnh Program.cs nếu cần (thêm AutoMapper, Dependency Injection, v.v.)
+
+Bước 3: Khi hoàn tất, hiển thị ví dụ 1 response JSON mẫu của API đã dùng DTO (theo ApiResponse<T>).
+
+Lưu ý: Khi thực thi, nên thực hiện từng phần (entity) một
+
+D. Tóm tắt yêu cầu
+- Tạo DTO (Create/Update/Response) cho tất cả Entities.
+- Cập nhật Service và Controller để dùng DTO thay cho Entity.
+- Repository không đổi.
+- Dùng AutoMapper nếu cần.
+- Giữ nguyên CRUD logic và cấu trúc dự án.
+- Giải thích kế hoạch trước khi bắt đầu code.

@@ -1,0 +1,62 @@
+@startuml
+title Sequence Diagram đặt sân - thanh toán - hoàn thành (Booking Flow)
+
+actor "Khách hàng (Customer)" as C
+actor "Chủ sân (Owner)" as O
+participant "API / WebApp" as API
+database "Database" as DB
+
+== Đặt sân mới ==
+C -> API: Gửi yêu cầu đặt sân (Field, TimeSlot)
+API -> DB: Tạo bản ghi BOOKING\nbooking_status = 0 (Pending)\npayment_status = 0 (Unpaid)
+DB --> API: Xác nhận đơn chờ xử lý
+API --> C: Hiển thị "Đơn đặt sân đang chờ xác nhận"
+
+== Thanh toán cọc ==
+C -> API: Chọn phương thức thanh toán (VNPay / Momo)
+API -> "Payment Gateway": Gửi yêu cầu thanh toán
+"Payment Gateway" --> API: Trả về transaction_id
+API -> DB: Cập nhật BOOKING\nbooking_status = 1 (Confirmed)\npayment_status = 1 (DepositPaid)\npayment_method = 'VNPay'\ntransaction_id = 'VN12345'
+DB --> API: Cập nhật thành công
+API --> C: Hiển thị "Đã thanh toán cọc thành công"
+
+== Xác nhận và theo dõi đơn ==
+O -> API: Xem danh sách đơn đặt sân
+API -> DB: Lọc BOOKING theo owner_id
+DB --> API: Trả danh sách Booking (status: Confirmed, DepositPaid)
+API --> O: Hiển thị danh sách đơn đặt sân
+
+== Diễn ra trận đấu ==
+note right of DB
+Khi đến ngày booking_date:
+- Hệ thống hoặc chủ sân kiểm tra trạng thái
+- Nếu trận đấu diễn ra thành công:
+  → booking_status = 3 (Completed)
+  → payment_status = 2 (FullyPaid)
+end note
+
+== Hủy đơn đặt ==
+C -> API: Gửi yêu cầu hủy
+API -> DB: Cập nhật BOOKING\nbooking_status = 2 (Cancelled)\ncancelled_at = GETDATE()
+API -> DB: Kiểm tra OWNER_SETTING.cancel_refund_policy
+API -> "Payment Gateway": Hoàn tiền (nếu có)
+DB -> DB: Cập nhật payment_status = 3 (Refunded)
+API --> C: Hiển thị "Đơn đặt đã được hủy và hoàn tiền (nếu đủ điều kiện)"
+
+== Khách không đến ==
+note right of DB
+Nếu đến giờ nhưng khách không đến:
+- booking_status = 4 (NoShow)
+- payment_status = 1 (DepositPaid)
+→ Cọc bị mất
+end note
+
+== Doanh thu & phí nền tảng ==
+O -> API: Yêu cầu xem báo cáo doanh thu
+API -> DB: Lấy BOOKING có booking_status = 3 (Completed)
+API -> DB: Lấy OWNER_SETTING.tax_rate
+DB --> API: Trả về doanh thu
+API -> API: Tính toán\nOwnerRevenue = total_amount × (1 - tax_rate)\nPlatformFee = total_amount × tax_rate
+API --> O: Hiển thị doanh thu chủ sân và phí nền tảng
+
+@enduml

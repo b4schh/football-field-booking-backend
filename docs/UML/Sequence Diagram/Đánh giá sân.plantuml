@@ -1,0 +1,16 @@
+@startuml
+title Sequence Diagram - Khách hàng đánh giá sân sau khi hoàn thành booking
+
+actor "Khách hàng (Customer)" as C
+participant "API / Mobile App" as API
+database "Database" as DB
+
+C -> API: Gửi đánh giá (booking_id, rating, comment)
+API -> DB: Kiểm tra booking_id hợp lệ\nvà booking_status = Completed
+DB --> API: OK
+API -> DB: Thêm bản ghi vào bảng REVIEW
+DB --> API: OK
+API -> DB: Ghi log USER_ACTIVITY_LOG (AddReview)
+DB --> API: OK
+API --> C: Thông báo “Đánh giá thành công”
+@enduml

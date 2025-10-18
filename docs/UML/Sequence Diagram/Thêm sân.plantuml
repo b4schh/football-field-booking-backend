@@ -1,0 +1,16 @@
+@startuml
+title Sequence Diagram - Chủ sân thêm sân mới
+
+actor "Chủ sân (Owner)" as O
+participant "API / Dashboard" as API
+database "Database" as DB
+
+O -> API: Gửi yêu cầu thêm sân (tên sân, loại mặt sân, kích thước, giá cơ bản)
+API -> DB: Kiểm tra quyền (role = Owner)
+DB --> API: Hợp lệ
+API -> DB: Thêm bản ghi mới vào bảng FIELD
+DB --> API: Trả về ID sân mới
+API -> DB: Ghi log USER_ACTIVITY_LOG (AddField)
+DB --> API: OK
+API --> O: Thông báo thêm sân thành công
+@enduml

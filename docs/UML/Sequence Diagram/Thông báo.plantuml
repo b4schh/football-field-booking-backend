@@ -1,0 +1,45 @@
+@startuml
+title Sequence Diagram - Luồng gửi thông báo đẩy (Push Notification Flow)
+
+actor "Người dùng A (Customer)" as U
+participant "API / Booking Service" as API
+database "Database" as DB
+participant "Firebase (FCM)" as FCM
+participant "Mobile App" as APP
+
+== Bước 1: Lưu token thiết bị khi người dùng đăng nhập ==
+APP -> API: Gửi device_token, device_type, user_id
+API -> DB: INSERT/UPDATE vào DEVICE_TOKEN
+DB --> API: OK
+API --> APP: Xác nhận lưu token thành công
+
+== Bước 2: Có sự kiện phát sinh thông báo ==
+API -> DB: INSERT INTO NOTIFICATION\n(user_id, title, message, type, related_id, is_read=0)
+DB --> API: Trả về notification_id = 42
+
+== Bước 3: Chuẩn bị gửi thông báo đẩy ==
+API -> DB: SELECT device_token, device_type FROM DEVICE_TOKEN\nWHERE user_id = @userId AND is_active = 1
+DB --> API: Trả về danh sách token (ví dụ: fcm_token_abc123)
+
+== Bước 4: Gửi thông báo qua Firebase FCM ==
+API -> FCM: Gửi request push notification\n(title, message, data.notification_id = 42)
+activate FCM
+FCM --> API: Trả kết quả "success: 1"
+deactivate FCM
+
+== Bước 5: Ghi lại kết quả gửi ==
+API -> DB: INSERT INTO PUSH_LOG\n(notification_id=42, channel='MobilePush', status=1, response='success:1')
+DB --> API: OK
+
+== Bước 6: Thiết bị nhận và hiển thị thông báo ==
+FCM -> APP: Push notification đến điện thoại
+APP -> U: Hiển thị thông báo “Đơn #120 được xác nhận”
+
+== Bước 7: Người dùng đọc thông báo ==
+U -> APP: Mở danh sách thông báo
+APP -> API: Cập nhật is_read = 1, read_at = GETDATE() cho notification_id=42
+API -> DB: UPDATE NOTIFICATION SET is_read=1, read_at=GETDATE()
+DB --> API: OK
+API --> APP: Xác nhận cập nhật thành công
+
+@enduml

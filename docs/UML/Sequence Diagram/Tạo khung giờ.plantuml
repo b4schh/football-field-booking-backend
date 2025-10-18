@@ -1,0 +1,17 @@
+@startuml
+title Sequence Diagram - Chủ sân tạo khung giờ cho sân
+
+actor "Chủ sân (Owner)" as O
+participant "API / Dashboard" as API
+database "Database" as DB
+
+O -> API: Chọn sân → Gửi thông tin khung giờ (start_time, end_time, price, day_of_week)
+API -> DB: Kiểm tra quyền và quyền sở hữu sân
+DB --> API: OK
+API -> DB: Kiểm tra trùng lặp khung giờ (UNIQUE constraint)
+DB --> API: Không trùng
+API -> DB: Thêm khung giờ mới vào bảng TIME_SLOT
+DB --> API: OK
+API -> DB: Ghi log USER_ACTIVITY_LOG (AddTimeSlot)
+API --> O: Thông báo thêm khung giờ thành công
+@enduml
