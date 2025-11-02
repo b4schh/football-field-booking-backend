@@ -5,11 +5,13 @@ using FootballField.API.Services.Interfaces;
 using FootballField.API.Services.Implements;
 using FootballField.API.Utils;
 using FootballField.API.Mappings;
+using FootballField.API.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Any;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +95,14 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API for managing football field bookings"
     });
 
+    // Map kiểu TimeSpan -> hiển thị dạng chuỗi HH:mm:ss
+    c.MapType<TimeSpan>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "time",
+        Example = new OpenApiString("HH:mm:ss")
+    });
+
     // Thêm định nghĩa bảo mật JWT
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -138,7 +148,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate(); // tự động tạo DB nếu chưa có
-    
+
     // Seed dữ liệu mẫu
     db.SeedData();
 }
@@ -155,7 +165,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 // Exception Middleware phải đứng đầu
-app.UseMiddleware<football_field_booking_backend.Middlewares.ExceptionMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Authentication & Authorization
 app.UseAuthentication();

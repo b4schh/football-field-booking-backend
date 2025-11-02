@@ -19,9 +19,7 @@ namespace FootballField.API.Controllers
             _authService = authService;
         }
 
-        /// <summary>
-        /// Register new user account
-        /// </summary>
+        // Đăng ký
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
@@ -31,20 +29,18 @@ namespace FootballField.API.Controllers
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage)
                     .ToList();
-                return Ok(ApiResponse<List<string>>.Fail(string.Join(", ", errors), 400));
+                return BadRequest(ApiResponse<List<string>>.Fail(string.Join(", ", errors), 400));
             }
 
             var result = await _authService.RegisterAsync(request);
             
             if (result == null)
-                return Ok(ApiResponse<string>.Fail("Email hoặc số điện thoại đã tồn tại", 400));
+                return BadRequest(ApiResponse<string>.Fail("Email hoặc số điện thoại đã tồn tại", 400));
 
             return Ok(ApiResponse<LoginResponse>.Ok(result, "Đăng ký thành công"));
         }
 
-        /// <summary>
-        /// Login endpoint - returns JWT token
-        /// </summary>
+        // Đăng nhập
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -54,7 +50,7 @@ namespace FootballField.API.Controllers
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage)
                     .ToList();
-                return Ok(ApiResponse<List<string>>.Fail(string.Join(", ", errors), 400));
+                return BadRequest(ApiResponse<List<string>>.Fail(string.Join(", ", errors), 400));
             }
 
             var result = await _authService.LoginAsync(request);
@@ -65,27 +61,23 @@ namespace FootballField.API.Controllers
             return Ok(ApiResponse<LoginResponse>.Ok(result, "Đăng nhập thành công"));
         }
 
-        /// <summary>
-        /// Get current user profile - requires authentication
-        /// </summary>
+        // Lấy thông tin người dùng hiện tại
         [HttpGet("profile")]
         [Authorize]
         public async Task<IActionResult> GetProfile()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-                return Ok(ApiResponse<string>.Fail("Unauthorized", 401));
+                return Unauthorized(ApiResponse<string>.Fail("Unauthorized", 401));
 
             var user = await _authService.GetCurrentUserAsync(userId);
             if (user == null)
-                return Ok(ApiResponse<string>.Fail("User not found", 404));
+                return NotFound(ApiResponse<string>.Fail("User not found", 404));
 
             return Ok(ApiResponse<UserDto>.Ok(user, "Lấy thông tin thành công"));
         }
 
-        /// <summary>
-        /// Admin only endpoint - demo authorization
-        /// </summary>
+        // Test phân quyền Admin
         [HttpGet("admin-only")]
         [Authorize(Roles = "Admin")]
         public IActionResult AdminOnly()

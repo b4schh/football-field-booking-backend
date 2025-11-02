@@ -64,6 +64,18 @@ namespace FootballField.API.Services.Implements
             await _userRepository.UpdateAsync(existingUser);
         }
 
+        public async Task UpdateUserRoleAsync(int id, UpdateUserRoleDto updateUserRoleDto)
+        {
+            var existingUser = await _userRepository.GetByIdAsync(id);
+            if (existingUser == null)
+                throw new Exception("User not found");
+
+            existingUser.Role = updateUserRoleDto.Role;
+            existingUser.UpdatedAt = DateTime.Now;
+            
+            await _userRepository.UpdateAsync(existingUser);
+        }
+
         public async Task SoftDeleteUserAsync(int id)
         {
             await _userRepository.SoftDeleteAsync(id);

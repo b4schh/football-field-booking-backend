@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json;
 using FootballField.API.Dtos;
 
-namespace football_field_booking_backend.Middlewares
+namespace FootballField.API.Middlewares
 {
     public class ExceptionMiddleware
     {
@@ -32,7 +32,7 @@ namespace football_field_booking_backend.Middlewares
         private async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
             // Log lỗi ra console
-            _logger.LogError(ex, "❌ Unhandled exception caught by middleware");
+            _logger.LogError(ex, "❌ Middleware đã bắt được một lỗi chưa được xử lý.");
 
             var statusCode = (int)HttpStatusCode.InternalServerError;
             var response = ApiResponse<string>.Fail(

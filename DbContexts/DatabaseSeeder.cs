@@ -6,7 +6,7 @@ public static class DatabaseSeeder
 {
     public static void SeedData(this ApplicationDbContext context)
     {
-        if (context.Users.Any()) return; // Không seed nếu đã có dữ liệu
+        if (context.Users.Any()) return;
 
         var now = DateTime.Now;
 

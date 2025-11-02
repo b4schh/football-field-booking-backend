@@ -51,12 +51,4 @@ Nếu đến giờ nhưng khách không đến:
 → Cọc bị mất
 end note
 
-== Doanh thu & phí nền tảng ==
-O -> API: Yêu cầu xem báo cáo doanh thu
-API -> DB: Lấy BOOKING có booking_status = 3 (Completed)
-API -> DB: Lấy OWNER_SETTING.tax_rate
-DB --> API: Trả về doanh thu
-API -> API: Tính toán\nOwnerRevenue = total_amount × (1 - tax_rate)\nPlatformFee = total_amount × tax_rate
-API --> O: Hiển thị doanh thu chủ sân và phí nền tảng
-
 @enduml

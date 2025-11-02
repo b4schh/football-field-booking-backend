@@ -27,7 +27,11 @@ namespace FootballField.API.Mappings
             // ========== COMPLEX MAPPINGS ==========
             CreateMap<Entities.Complex, ComplexDto>();
             CreateMap<Entities.Complex, ComplexWithFieldsDto>();
+            CreateMap<Entities.Complex, ComplexFullDetailsDto>()
+                .ForMember(dest => dest.Fields, opt => opt.Ignore()); // Ignore vì map thủ công trong Service
             CreateMap<CreateComplexDto, Entities.Complex>();
+            CreateMap<CreateComplexByOwnerDto, Entities.Complex>();
+            CreateMap<CreateComplexByAdminDto, Entities.Complex>();
             CreateMap<UpdateComplexDto, Entities.Complex>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.OwnerId, opt => opt.Ignore())

@@ -16,10 +16,8 @@ namespace FootballField.API.Controllers
         {
             _reviewService = reviewService;
         }
-
-        /// <summary>
-        /// Get all reviews
-        /// </summary>
+        
+        /// Lấy tất cả Reviews
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -27,22 +25,20 @@ namespace FootballField.API.Controllers
             return Ok(ApiResponse<IEnumerable<ReviewDto>>.Ok(reviews, "Lấy danh sách đánh giá thành công"));
         }
 
-        /// <summary>
-        /// Get review by ID
-        /// </summary>
+        
+        // Lấy Review theo ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var review = await _reviewService.GetReviewByIdAsync(id);
             if (review == null)
-                return Ok(ApiResponse<string>.Fail("Không tìm thấy đánh giá", 404));
+                return NotFound(ApiResponse<string>.Fail("Không tìm thấy đánh giá", 404));
 
             return Ok(ApiResponse<ReviewDto>.Ok(review, "Lấy thông tin đánh giá thành công"));
         }
 
-        /// <summary>
-        /// Get reviews by field ID
-        /// </summary>
+        
+        // Lấy Review theo FieldID
         [HttpGet("field/{fieldId}")]
         public async Task<IActionResult> GetByFieldId(int fieldId)
         {
@@ -50,9 +46,8 @@ namespace FootballField.API.Controllers
             return Ok(ApiResponse<IEnumerable<ReviewDto>>.Ok(reviews, "Lấy danh sách đánh giá thành công"));
         }
 
-        /// <summary>
-        /// Get average rating by field ID
-        /// </summary>
+        
+        // Lấy rating trung bình theo FieldID
         [HttpGet("field/{fieldId}/average-rating")]
         public async Task<IActionResult> GetAverageRating(int fieldId)
         {
@@ -60,45 +55,42 @@ namespace FootballField.API.Controllers
             return Ok(ApiResponse<double>.Ok(avgRating, "Lấy điểm trung bình thành công"));
         }
 
-        /// <summary>
-        /// Create new review
-        /// </summary>
+        
+        // Tạo Review mới
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateReviewDto createReviewDto)
         {
             var created = await _reviewService.CreateReviewAsync(createReviewDto);
-            return Ok(ApiResponse<ReviewDto>.Ok(created, "Tạo đánh giá thành công", 201));
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, ApiResponse<ReviewDto>.Ok(created, "Tạo đánh giá thành công", 201));
         }
 
-        /// <summary>
-        /// Update review
-        /// </summary>
+        
+        // Cập nhật Review
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateReviewDto updateReviewDto)
         {
             var existing = await _reviewService.GetReviewByIdAsync(id);
             if (existing == null)
-                return Ok(ApiResponse<string>.Fail("Không tìm thấy đánh giá", 404));
+                return NotFound(ApiResponse<string>.Fail("Không tìm thấy đánh giá", 404));
 
             await _reviewService.UpdateReviewAsync(id, updateReviewDto);
-            return Ok(ApiResponse<string>.Ok(null, "Cập nhật đánh giá thành công"));
+            return Ok(ApiResponse<string>.Ok("", "Cập nhật đánh giá thành công"));
         }
 
-        /// <summary>
-        /// Soft delete review
-        /// </summary>
+        
+        // Xóa Review
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var existing = await _reviewService.GetReviewByIdAsync(id);
             if (existing == null)
-                return Ok(ApiResponse<string>.Fail("Không tìm thấy đánh giá", 404));
+                return NotFound(ApiResponse<string>.Fail("Không tìm thấy đánh giá", 404));
 
             await _reviewService.SoftDeleteReviewAsync(id);
-            return Ok(ApiResponse<string>.Ok(null, "Xóa đánh giá thành công"));
+            return Ok(ApiResponse<string>.Ok("", "Xóa đánh giá thành công"));
         }
     }
 }

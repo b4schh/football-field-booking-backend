@@ -561,39 +561,24 @@ var filtered = allUsers.Where(u => !u.IsDeleted).ToList();
 
 ---
 
-## 17. TESTING (Future Implementation)
 
-### 17.1. Unit Tests
-- Test Business Logic trong Services
-- Mock Dependencies với Moq
-- Naming: `MethodName_Scenario_ExpectedResult`
+## 17. SECURITY BEST PRACTICES
 
-### 17.2. Integration Tests
-- Test API Endpoints
-- Test Database operations
-- Use In-Memory Database hoặc Test Database
-
----
-
-## 18. SECURITY BEST PRACTICES
-
-### 18.1. Password Hashing
+### 17.1. Password Hashing
 - Sử dụng BCrypt hoặc PBKDF2
 - Never store plain text passwords
 - Implement password strength validation
 
-### 18.2. Input Validation
+### 17.2. Input Validation
 - Validate tất cả user inputs
 - Sanitize data trước khi lưu vào DB
 - Use Data Annotations hoặc FluentValidation
 
-### 18.3. Authorization
+### 17.3. Authorization
 - Implement Role-Based Access Control (RBAC)
 - Check ownership trước khi modify resources
 - Log security-related events
 
 ---
 
-**Created by**: GitHub Copilot
-**Last Updated**: 2024
 **Project**: Football Field Booking Backend API

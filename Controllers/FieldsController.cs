@@ -17,9 +17,7 @@ namespace FootballField.API.Controllers
             _fieldService = fieldService;
         }
 
-        /// <summary>
-        /// Get all fields with pagination
-        /// </summary>
+        // Lấy tất cả Fields phân trang
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
         {
@@ -28,35 +26,32 @@ namespace FootballField.API.Controllers
             return Ok(response);
         }
 
-        /// <summary>
-        /// Get field by ID
-        /// </summary>
+
+        // Lấy Field theo ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var field = await _fieldService.GetFieldByIdAsync(id);
             if (field == null)
-                return Ok(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
+                return NotFound(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
 
             return Ok(ApiResponse<FieldDto>.Ok(field, "Lấy thông tin sân con thành công"));
         }
 
-        /// <summary>
-        /// Get field with time slots
-        /// </summary>
+
+        // Lấy Field kèm Timeslots
         [HttpGet("{id}/with-timeslots")]
         public async Task<IActionResult> GetWithTimeSlots(int id)
         {
             var field = await _fieldService.GetFieldWithTimeSlotsAsync(id);
             if (field == null)
-                return Ok(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
+                return NotFound(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
 
             return Ok(ApiResponse<FieldWithTimeSlotsDto>.Ok(field, "Lấy thông tin sân con thành công"));
         }
 
-        /// <summary>
-        /// Get fields by complex ID
-        /// </summary>
+
+        // Lấy Field theo ComplexID
         [HttpGet("complex/{complexId}")]
         public async Task<IActionResult> GetByComplexId(int complexId)
         {
@@ -64,45 +59,42 @@ namespace FootballField.API.Controllers
             return Ok(ApiResponse<IEnumerable<FieldDto>>.Ok(fields, "Lấy danh sách sân con thành công"));
         }
 
-        /// <summary>
-        /// Create new field
-        /// </summary>
+
+        // Tạo Field mới
         [HttpPost]
         [Authorize(Roles = "Admin,Owner")]
         public async Task<IActionResult> Create([FromBody] CreateFieldDto createFieldDto)
         {
             var created = await _fieldService.CreateFieldAsync(createFieldDto);
-            return Ok(ApiResponse<FieldDto>.Ok(created, "Tạo sân con thành công", 201));
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, ApiResponse<FieldDto>.Ok(created, "Tạo sân con thành công", 201));
         }
 
-        /// <summary>
-        /// Update field
-        /// </summary>
+
+        /// Cập nhật Field
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Owner")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateFieldDto updateFieldDto)
         {
             var existing = await _fieldService.GetFieldByIdAsync(id);
             if (existing == null)
-                return Ok(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
+                return NotFound(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
 
             await _fieldService.UpdateFieldAsync(id, updateFieldDto);
-            return Ok(ApiResponse<string>.Ok(null, "Cập nhật sân con thành công"));
+            return Ok(ApiResponse<string>.Ok("", "Cập nhật sân con thành công"));
         }
 
-        /// <summary>
-        /// Soft delete field
-        /// </summary>
+
+        // Xóa Field
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin,Owner")]
         public async Task<IActionResult> Delete(int id)
         {
             var existing = await _fieldService.GetFieldByIdAsync(id);
             if (existing == null)
-                return Ok(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
+                return NotFound(ApiResponse<string>.Fail("Không tìm thấy sân con", 404));
 
             await _fieldService.SoftDeleteFieldAsync(id);
-            return Ok(ApiResponse<string>.Ok(null, "Xóa sân con thành công"));
+            return Ok(ApiResponse<string>.Ok("", "Xóa sân con thành công"));
         }
     }
 }

@@ -63,5 +63,17 @@ namespace FootballField.API.Repositories.Implements
                 .OrderBy(b => b.BookingDate)
                 .ToListAsync();
         }
+
+        public async Task<HashSet<(int FieldId, int TimeSlotId)>> GetBookedTimeSlotIdsForComplexAsync(int complexId, DateTime date)
+        {
+            var bookedSlots = await _dbSet
+                .Where(b => b.Field.ComplexId == complexId 
+                            && b.BookingDate.Date == date.Date
+                            && b.BookingStatus != BookingStatus.Cancelled)
+                .Select(b => new { b.FieldId, b.TimeSlotId })
+                .ToListAsync();
+
+            return bookedSlots.Select(b => (b.FieldId, b.TimeSlotId)).ToHashSet();
+        }
     }
 }

@@ -1,3 +1,4 @@
+
 namespace FootballField.API.Dtos
 {
     public class ApiResponse<T>
@@ -28,5 +29,10 @@ namespace FootballField.API.Dtos
             {
                 Errors = errors
             };
+
+        internal static object? Fail(object value, int v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
